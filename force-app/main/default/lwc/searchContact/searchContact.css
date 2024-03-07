@@ -1,0 +1,96 @@
+.slds-card {
+    text-align: center;
+    padding: 24px;
+}
+
+.title {
+    text-align: center;
+    padding-bottom: 12px;
+}
+
+.element-1 {
+    padding-left: 24.5%;
+}
+
+.element-2 {
+    padding-left: 5%;
+}
+
+.element-3 {
+    padding-left: 12%;
+}
+
+.bd-bottom {
+    padding-bottom: 24px;
+    border-bottom: 1px solid #111;
+    width: 50%;
+    margin: 24px auto;
+}
+
+.text-h2-md {
+    font-size: 12px;
+    font-weight: bold;
+    padding-bottom: 24px;
+}
+
+.btn-pr {
+    text-align: center;
+}
+
+.btn {
+    width: 160px;
+    margin: 0 12px;
+}
+
+.text-sp {
+    padding-right: 5px;
+}
+
+.slds-checkbox_faux {
+    padding: 15px;
+    margin-top: 5px;
+}
+
+.border-left {
+    border-left: 1px dashed #111;
+}
+
+.slds-text-body_regular {
+    padding: 14px 0;
+}
+
+.slds-checkbox {
+    margin: 11px 0;
+}
+
+.c-table, tr, td, th{
+    padding: 10px;
+    margin: auto;
+    border: none;
+    border-top-color: #fff!important;
+    background-color: #fff!important;
+}
+
+.bgw {
+    background-color: #fff;
+}
+
+.fullname {
+    width: 50%;
+}
+
+.dash {
+    border-right:   1px dashed #111;
+}
+
+.input-field {
+    margin: 0 auto;
+}
+
+.checkbox {
+    text-align: center;
+}
+
+.brb {
+    border-bottom: 1px solid #111;
+}

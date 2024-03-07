@@ -1,0 +1,223 @@
+<template>
+    <lightning-card class="container">
+        <div if:true={errorMsg} style="margin-left: 3%;">
+            <p style="color: red;">{errorMsg}</p>
+        </div>
+        <h2 class="title">Sansan business card import screen</h2>
+        <lightning-layout multiple-rows="true" class="form-search">
+            <!-- Row 1 -->
+            <lightning-layout-item size="12" small-device-size="12" medium-device-size="9" large-device-size="9">
+                <div class="slds-form" role="list">
+                    <div class="slds-form__row">
+                        <div class="slds-form__item" role="listitem">
+                            <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                <label class="slds-form-element__label text_01" for="single-form-element-id-02">Full
+                                    name</label>
+                                <div class="slds-form-element__control element-1">
+                                    <input type="text" id="single-form-element-id-02" placeholder=" text…"
+                                        class="slds-input" onchange={handleContactName} />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form__item" role="listitem">
+                            <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                <div class="slds-form-element__control element-2">
+                                    <lightning-button label="Search" variant="brand"
+                                        onclick={handleSearch}></lightning-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form__row">
+                        <div class="slds-form__item" role="listitem">
+                            <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                <label class="slds-form-element__label" for="single-form-element-id-04">Company
+                                    name</label>
+                                <div class="slds-form-element__control element-3">
+                                    <input type="text" id="single-form-element-id-04" placeholder=" text…"
+                                        class="slds-input" onchange={handleCompanyName} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </lightning-layout-item>
+        </lightning-layout>
+        <div class="bd-bottom"></div>
+        <div class="slds-form" role="list">
+            <div class="slds-form__row">
+                <div class="slds-form__item" role="listitem">
+                    <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                        <lightning-datatable data={searchData} columns={columns} key-field="id"
+                            hide-checkbox-column="true"></lightning-datatable>
+                    </div>
+                </div>
+                <div class="slds-form__item" role="listitem">
+                    <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                        <div class="slds-form-element__control element-2">
+                            <lightning-button label="Open Modal" onclick={openModal}></lightning-button>
+                            <template if:true={isModalOpen}>
+                                <div class="slds-backdrop slds-backdrop_open"></div>
+                                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01"
+                                    aria-modal="true" aria-describedby="modal-content-id-1"
+                                    class="slds-modal slds-fade-in-open">
+                                    <div class="slds-modal__container">
+                                        <header class="slds-modal__header">
+                                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                                                Existing record association screen</h2>
+                                        </header>
+                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                            <h2 class="text-h2-md">Contact</h2>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div
+                                                        class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                                        <div style="height: 300px;">
+                                                            <lightning-datatable key-field="id" data={searchData}
+                                                                columns={columns} onrowselection={handleRowSelection}>
+                                                            </lightning-datatable>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element">
+                                                <div class="slds-form-element__control btn-pr">
+                                                    <button class="slds-button slds-button_brand btn"
+                                                        onclick={handelAssociation}>association only</button>
+                                                    <button class="slds-button slds-button_brand btn"
+                                                        onclick={handleUpdate}>Update</button>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element">
+                                                <h2>Lead</h2>
+                                                <p style="text-align: center; padding-bottom: 24px">There are no
+                                                    existing records</p>
+                                                <div class="slds-form-element__control btn-pr">
+                                                    <button class="slds-button slds-button_brand btn"
+                                                        onclick={handelNewLead}>New Lead</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <footer class="slds-modal__footer">
+                                            <button class="slds-button slds-button_neutral"
+                                                onclick={closeModal}>Close</button>
+                                        </footer>
+                                    </div>
+                                </section>
+                            </template>
+                            <template if:true={isModalOpenUpdate}>
+                                <div class="slds-backdrop slds-backdrop_open"></div>
+                                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02"
+                                    aria-modal="true" aria-describedby="modal-content-id-2"
+                                    class="slds-modal slds-fade-in-open">
+                                    <div class="slds-modal__container">
+                                        <header class="slds-modal__header">
+                                            <h2 id="modal-heading-07" class="slds-text-heading_medium slds-hyphenate">
+                                                Existing record update screen</h2>
+                                        </header>
+                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                                            <h2 class="text-h2-md">Contact</h2>
+                                            <h2 style="text-align: center;color:red">{messageUpdate}</h2>
+                                            <div class="slds-box">
+                                                <table class="slds-table slds-table_bordered slds-table_cell-buffer c-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" class="fullname dash bgw">Full Name</th>
+                                                            <th scope="col" class="bgw">Input Field</th>
+                                                            <th scope="col" class="bgw">Checkbox Field</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <template for:each={listContactSelected} for:item="item" for:index="index">
+                                                            <tr key={item.id}>
+                                                                <td class="dash" data-label="Full Name">{item.Name}</td>
+                                                                <td data-label="Input Field">
+                                                                    <lightning-input class="input-field" type="text" value={item.Name} onchange={handleChange} data-key={index} data-field="Name"></lightning-input>
+                                                                </td>
+                                                                <td  class="checkbox" data-label="Checkbox Field">
+                                                                    <lightning-input type="checkbox" checked={item.isChecked} onchange={handleCheckboxChange} data-key={index} data-field="Name"></lightning-input>
+                                                                </td>
+                                                            </tr>
+                                                            <tr key={item.id} class="brb">
+                                                                <td class="dash" data-label="Full Name">{item.Company_Name__c}</td>
+                                                                <td data-label="Input Field">
+                                                                    <lightning-input  class="input-field" type="text" value={item.Company_Name__c} onchange={handleChange} data-key={index} data-field="Company_Name__c"></lightning-input>
+                                                                </td>
+                                                                <td class="checkbox" data-label="Checkbox Field">
+                                                                    <lightning-input type="checkbox" checked={item.isChecked} onchange={handleCheckboxChange} data-key={index} data-field="Company_Name__c"></lightning-input>
+                                                                </td>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                                <div class="slds-m-top_medium btn-pr">
+                                                    <lightning-button label="Update"
+                                                        onclick={handleSave}></lightning-button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <footer class="slds-modal__footer">
+                                            <button class="slds-button slds-button_neutral"
+                                                onclick={closeModalUpdate}>Close</button>
+                                        </footer>
+                                    </div>
+                                </section>
+                            </template>
+                            <template if:true={isModalOpenNewLead}>
+                                <div class="slds-backdrop slds-backdrop_open"></div>
+                                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02"
+                                    aria-modal="true" aria-describedby="modal-content-id-2"
+                                    class="slds-modal slds-fade-in-open">
+                                    <div class="slds-modal__container">
+                                        <header class="slds-modal__header">
+                                            <h2 id="modal-heading-08" class="slds-text-heading_medium slds-hyphenate">
+                                                Lead registration screen</h2>
+                                            <h2 style="text-align: center;color:red">{messageUpdate}</h2>
+                                        </header>
+                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+                                            <div class="slds-box">
+                                                <table class="slds-table slds-table_bordered slds-table_cell-buffer c-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Full Name</th>
+                                                            <th scope="col" class="checkbox">Checkbox Field</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <template for:each={listContactSelected} for:item="item" for:index="index">
+                                                            <tr key={item.id}>
+                                                                <td data-label="Full Name">{item.Name}</td>
+                                                                <td data-label="Checkbox Field">
+                                                                    <lightning-input class="checkbox" type="checkbox" checked={item.isChecked} value={item.Name} onchange={handleBoxChange} data-key={index} data-field="Name"></lightning-input>
+                                                                </td>
+                                                            </tr>
+                                                            <tr key={item.id} class="brb">
+                                                                <td data-label="Full Name">{item.Company_Name__c}</td>
+                                                                <td data-label="Checkbox Field">
+                                                                    <lightning-input class="checkbox" type="checkbox" checked={item.isChecked} value={item.Company_Name__c} onchange={handleBoxChange} data-key={index} data-field="Company"></lightning-input>
+                                                                </td>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                                <div class="slds-m-top_medium btn-pr">
+                                                    <lightning-button label="New Lead"
+                                                        onclick={handleCreateLead}></lightning-button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <footer class="slds-modal__footer">
+                                            <button class="slds-button slds-button_neutral"
+                                                onclick={closeModalNewLead}>Close</button>
+                                        </footer>
+                                    </div>
+                                </section>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+
+</template>
