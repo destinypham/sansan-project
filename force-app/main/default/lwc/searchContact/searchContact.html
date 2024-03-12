@@ -28,6 +28,7 @@
                             </div>
                         </div>
                     </div>
+                    <!--
                     <div class="slds-form__row">
                         <div class="slds-form__item" role="listitem">
                             <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
@@ -40,6 +41,7 @@
                             </div>
                         </div>
                     </div>
+                    -->
                 </div>
             </lightning-layout-item>
         </lightning-layout>
@@ -73,14 +75,13 @@
                                                     <div
                                                         class="slds-form-element slds-form-element_horizontal slds-is-editing">
                                                         <div style="height: 300px;">
-                                                            <lightning-datatable key-field="id" data={searchData}
-                                                                columns={columns} onrowselection={handleRowSelection}>
+                                                            <lightning-datatable key-field="Id" data={searchData} columns={columns} selected-rows={selectedContactIds} onrowselection={handleRowSelection} >
                                                             </lightning-datatable>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="slds-form-element">
+                                            <div if:true={showButton} class="slds-form-element">
                                                 <div class="slds-form-element__control btn-pr">
                                                     <button class="slds-button slds-button_brand btn"
                                                         onclick={handelAssociation}>association only</button>
@@ -88,7 +89,7 @@
                                                         onclick={handleUpdate}>Update</button>
                                                 </div>
                                             </div>
-                                            <div class="slds-form-element">
+                                            <div if:true={showButtonNewLead} class="slds-form-element">
                                                 <h2>Lead</h2>
                                                 <p style="text-align: center; padding-bottom: 24px">There are no
                                                     existing records</p>
@@ -122,7 +123,7 @@
                                                 <table class="slds-table slds-table_bordered slds-table_cell-buffer c-table">
                                                     <thead>
                                                         <tr>
-                                                            <th scope="col" class="fullname dash bgw">Full Name</th>
+                                                            <th scope="col" class="fullname dash bgw">Contact Information</th>
                                                             <th scope="col" class="bgw">Input Field</th>
                                                             <th scope="col" class="bgw">Checkbox Field</th>
                                                         </tr>
@@ -130,21 +131,21 @@
                                                     <tbody>
                                                         <template for:each={listContactSelected} for:item="item" for:index="index">
                                                             <tr key={item.id}>
-                                                                <td class="dash" data-label="Full Name">{item.Name}</td>
+                                                                <td class="dash" data-label="Full Name">{item.id}</td>
                                                                 <td data-label="Input Field">
-                                                                    <lightning-input class="input-field" type="text" value={item.Name} onchange={handleChange} data-key={index} data-field="Name"></lightning-input>
+                                                                    <lightning-input class="input-field" type="text" value={item.id} onchange={handleChange} data-key={index} data-field="id" readonly="true"></lightning-input>
                                                                 </td>
                                                                 <td  class="checkbox" data-label="Checkbox Field">
-                                                                    <lightning-input type="checkbox" checked={item.isChecked} onchange={handleCheckboxChange} data-key={index} data-field="Name"></lightning-input>
+                                                                    <lightning-input type="checkbox" value={item.id} onchange={handleCheckboxChange} data-key={index} data-field="id"></lightning-input>
                                                                 </td>
                                                             </tr>
                                                             <tr key={item.id} class="brb">
-                                                                <td class="dash" data-label="Full Name">{item.Company_Name__c}</td>
+                                                                <td class="dash" data-label="Full Name">{item.name}</td>
                                                                 <td data-label="Input Field">
-                                                                    <lightning-input  class="input-field" type="text" value={item.Company_Name__c} onchange={handleChange} data-key={index} data-field="Company_Name__c"></lightning-input>
+                                                                    <lightning-input  class="input-field" type="text" value={item.name} onchange={handleChange} data-key={index} data-field="name"></lightning-input>
                                                                 </td>
                                                                 <td class="checkbox" data-label="Checkbox Field">
-                                                                    <lightning-input type="checkbox" checked={item.isChecked} onchange={handleCheckboxChange} data-key={index} data-field="Company_Name__c"></lightning-input>
+                                                                    <lightning-input type="checkbox" value={item.name} onchange={handleCheckboxChange} data-key={index} data-field="name"></lightning-input>
                                                                 </td>
                                                             </tr>
                                                         </template>
@@ -186,15 +187,15 @@
                                                     <tbody>
                                                         <template for:each={listContactSelected} for:item="item" for:index="index">
                                                             <tr key={item.id}>
-                                                                <td data-label="Full Name">{item.Name}</td>
+                                                                <td data-label="Full Name">{item.id}</td>
                                                                 <td data-label="Checkbox Field">
-                                                                    <lightning-input class="checkbox" type="checkbox" checked={item.isChecked} value={item.Name} onchange={handleBoxChange} data-key={index} data-field="Name"></lightning-input>
+                                                                    <lightning-input class="checkbox" type="checkbox" checked={item.isChecked} value={item.id} onchange={handleBoxChange} data-key={index} data-field="id"></lightning-input>
                                                                 </td>
                                                             </tr>
                                                             <tr key={item.id} class="brb">
-                                                                <td data-label="Full Name">{item.Company_Name__c}</td>
+                                                                <td data-label="Full Name">{item.name}</td>
                                                                 <td data-label="Checkbox Field">
-                                                                    <lightning-input class="checkbox" type="checkbox" checked={item.isChecked} value={item.Company_Name__c} onchange={handleBoxChange} data-key={index} data-field="Company"></lightning-input>
+                                                                    <lightning-input class="checkbox" type="checkbox" checked={item.isChecked} value={item.name} onchange={handleBoxChange} data-key={index} data-field="name"></lightning-input>
                                                                 </td>
                                                             </tr>
                                                         </template>

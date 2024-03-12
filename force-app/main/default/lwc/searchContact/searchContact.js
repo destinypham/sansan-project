@@ -2,15 +2,15 @@ import { LightningElement, track, wire } from 'lwc';
 import searchContact from '@salesforce/apex/ContactController.searchContact';
 import updateContact from '@salesforce/apex/ContactController.updateContact';
 import insertLeads from '@salesforce/apex/ContactController.insertLeads';
-import generateData from './generateContact';
+import getContact from '@salesforce/apex/ContactController.getContact';
 
 const columns = [
     {
-        label: 'Full Name',
-        fieldName: 'Name'
+        label: 'Contact External Id',
+        fieldName: 'id'
     }, {
-        label: 'Company Name',
-        fieldName: 'Company_Name__c',
+        label: 'Contact Name',
+        fieldName: 'name',
     }
 ];
 
@@ -28,27 +28,39 @@ export default class SearchContact extends LightningElement {
     @track leads = [];
     @track listContactUpdate = [];
     @track messageUpdate = '';
+    @track showButton = false;
+    @track selectedContactIds = [];
+    @track showButtonNewLead = false;
 
+    @wire(getContact)
+    wiredContacts({ error, data }) {
+        if (data) {
+            this.searchData = data.map(contact => ({ name: contact.name, id: contact.id }));
+        } else if (error) {
+            console.error('Error retrieving contacts:', error);
+        }
+    }
 
     handleContactName(event) {
         this.errorMsg = '';
         this.contactName = event.currentTarget.value;
     }
 
-    handleCompanyName(event) {
+    /*handleCompanyName(event) {
         this.errorMsg = '';
         this.companyName = event.currentTarget.value;
-    }
+    }*/
 
     handleSearch() {
+        this.searchData = [];
         if (!this.contactName) {
             this.errorMsg = 'Please enter account name to search.';
             this.searchData = undefined;
             return;
         }
-        searchContact({ contactName: this.contactName, companyName: this.companyName })
+        searchContact({ contactName: this.contactName})
             .then(result => {
-                this.searchData = result;
+                this.searchData = result.map(contact => ({ name: contact.name, id: contact.id }));
             })
             .catch(error => {
                 this.searchData = undefined;
@@ -64,24 +76,45 @@ export default class SearchContact extends LightningElement {
 
     openModal() {
         this.isModalOpen = true;
-        this.searchData = generateData({ searchData: this.searchData });
     }
 
     closeModal() {
         this.isModalOpen = false;
+        this.selectedContactIds = [];
+        this.isModalOpenUpdate = false;
+        this.showButtonNewLead = false;
+        this.showButton = false;
     }
 
     handleRowSelection(event) {
         this.listContactSelected = event.detail.selectedRows;
+        this.showButton = true;
+        console.log('listContactSelected: ' + this.listContactSelected);
+        if(this.listContactSelected.length == 0) {
+            this.showButton = false;
+            this.showButtonNewLead = false;
+        }
     }
 
     handleUpdate() {
         this.isModalOpen = false;
         this.isModalOpenUpdate = true;
+        this.selectedContactIds = [];
     }
 
     closeModalUpdate() {
         this.isModalOpenUpdate = false;
+        this.isModalOpen = true;
+        console.log(JSON.stringify(this.listContactSelected));
+        this.listContactSelected.forEach(row => {
+            if (!this.selectedContactIds.includes(row.Id)) {
+                this.selectedContactIds.push(row.Id);
+            }
+        });
+    }
+
+    handelAssociation() {
+        this.showButtonNewLead = true;
     }
 
     handleFullNameChange(event) {
@@ -90,29 +123,23 @@ export default class SearchContact extends LightningElement {
     }
 
     handleChange(event) {
-        console.log('listContactUpdate: ' + JSON.stringify(this.listContactSelected));
         const key = parseInt(event.target.dataset.key);
         const newValue = event.target.value;
         const fieldToUpdate = event.target.dataset.field;
-        console.log('key: ' + key);
-        console.log('value: ' + newValue);
-        console.log('field: ' + fieldToUpdate);
 
         const contactToUpdate = this.listContactUpdate.findIndex(contact => contact.key === key);
 
         if (contactToUpdate !== -1) {
-            if (fieldToUpdate === 'Name') {
-                this.listContactUpdate[contactToUpdate].Name = newValue;
-            } else if (fieldToUpdate === 'Company_Name__c') {
-                this.listContactUpdate[contactToUpdate].Company_Name__c = newValue;
+            if (fieldToUpdate === 'name') {
+                this.listContactUpdate[contactToUpdate].name = newValue;
             }
         } else {
             const newContact = {
                 key: key,
-                Name: fieldToUpdate === 'Name' ? newValue : '',
-                Company_Name__c: fieldToUpdate === 'Company_Name__c' ? newValue : '',
-                isUpdateName: false,
-                isUpdateCompany: false
+                id: '',
+                name: fieldToUpdate === 'name' ? newValue : '',
+                isUpdateId: false,
+                isUpdateName: false
             };
             this.listContactUpdate.push(newContact);
         }
@@ -122,50 +149,44 @@ export default class SearchContact extends LightningElement {
         const key = parseInt(event.target.dataset.key);
         const isChecked = event.target.checked;
         const fieldToUpdate = event.target.dataset.field;
-        console.log('key: ' + key);
-        console.log('isChecked: ' + isChecked);
-        console.log('fieldToUpdate: ' + isChecked);
+        const newValue = event.target.value;
 
-        const contactToUpdate = this.listContactUpdate.findIndex(contact => contact.key === key);
+        const contactToUpdateIndex = this.listContactUpdate.findIndex(contact => contact.key === key);
 
-        if (contactToUpdate !== -1) {
-            if (fieldToUpdate === 'Name') {
-                this.listContactUpdate[contactToUpdate].isUpdateName = isChecked;
-            } else if (fieldToUpdate === 'Company_Name__c') {
-                this.listContactUpdate[contactToUpdate].isUpdateCompany = isChecked;
+        if (contactToUpdateIndex !== -1) {
+            if (fieldToUpdate === 'id') {
+                this.listContactUpdate[contactToUpdateIndex].id = isChecked ? newValue : '';
+                this.listContactUpdate[contactToUpdateIndex].isUpdateId = isChecked;
+            } else if (fieldToUpdate === 'name') {
+                this.listContactUpdate[contactToUpdateIndex].name = isChecked ? newValue : '';
+                this.listContactUpdate[contactToUpdateIndex].isUpdateName = isChecked;
             }
         } else {
             const newContact = {
                 key: key,
-                Name: '',
-                Company_Name__c: '',
-                isUpdateName: fieldToUpdate === 'Name' ? isChecked : false,
-                isUpdateCompany: fieldToUpdate === 'Company_Name__c' ? isChecked : false
+                id: fieldToUpdate === 'id' && isChecked ? newValue : '',
+                name: fieldToUpdate === 'name' && isChecked ? newValue : '',
+                isUpdateId: fieldToUpdate === 'id' ? isChecked : false,
+                isUpdateName: fieldToUpdate === 'name' ? isChecked : false
             };
             this.listContactUpdate.push(newContact);
         }
     }
 
     handleSave() {
-        // Logic to save the data
-        console.log('listContactUpdate: ' + JSON.stringify(this.listContactUpdate));
-        console.log('listContactSelected1111: ' + JSON.stringify(this.listContactSelected));
         if (this.listContactUpdate.length > 0) {
             this.listContactSelected = this.listContactSelected.map((contact, index) => {
-                console.log('index: ' + index);
-                console.log('contact: ' + contact);
                 let updatedContact = this.listContactUpdate.find(item => item.key === index);
-                let name = (updatedContact && updatedContact.isUpdateName && updatedContact.Name !== '') ? updatedContact.Name : contact.Name;
-                let companyName = (updatedContact && updatedContact.isUpdateCompany && updatedContact.Company_Name__c !== '') ? updatedContact.Company_Name__c : contact.Company_Name__c;
+                let id = (updatedContact && updatedContact.isUpdateId && updatedContact.id !== '') ? updatedContact.id : '';
+                let name = (updatedContact && updatedContact.isUpdateName && updatedContact.name !== '') ? updatedContact.name : '';
                 return {
                     ...contact,
-                    Name: name,
-                    Company_Name__c: companyName
+                    id: id,
+                    name: name
                 };
             })
-
-        console.log('listContactSelected: ' + JSON.stringify(this.listContactSelected));
-        updateContact({ contacts: this.listContactSelected })
+        const contacts = this.listContactSelected;
+        updateContact({ contacts: contacts })
             .then(result => {
                 this.messageUpdate = result;
             })
@@ -191,33 +212,43 @@ export default class SearchContact extends LightningElement {
 
         if (leadToUpdate !== -1) {
             if(!isChecked) {
-                this.leads = this.leads.filter(lead => lead.Name !== newValue);
+                this.leads = this.leads.filter(lead => lead.id !== newValue);
             } else {
-                if (fieldToUpdate === 'Name') {
+                if (fieldToUpdate === 'id') {
+                    this.leads[leadToUpdate].Id = newValue;
+                } else if (fieldToUpdate === 'name') {
                     this.leads[leadToUpdate].Name = newValue;
-                } else if (fieldToUpdate === 'Company') {
-                    this.leads[leadToUpdate].Company = newValue;
                 }
             }
         } else {
             if(isChecked) {
                 const newLead = {
                     key: key,
-                    Name: fieldToUpdate == 'Name' ? newValue : '',
-                    Company: fieldToUpdate == 'Company' ? newValue : ''
+                    Id: fieldToUpdate == 'id' ? newValue : '',
+                    Name: fieldToUpdate == 'name' ? newValue : ''
                 };
                 this.leads.push(newLead);
             }
         }
+        console.log(JSON.stringify(this.leads));
     }
 
     handelNewLead() {
         this.isModalOpen = false;
         this.isModalOpenNewLead = true;
+        this.selectedContactIds = [];
     }
 
     closeModalNewLead() {
         this.isModalOpenNewLead = false;
+        this.isModalOpen = true;
+        console.log(JSON.stringify(this.listContactSelected));
+        this.listContactSelected.forEach(row => {
+            if (!this.selectedContactIds.includes(row.Id)) {
+                this.selectedContactIds.push(row.Id);
+            }
+        });
+        console.log(JSON.stringify(this.selectedContactIds));
     }
 
     handleCreateLead() {
