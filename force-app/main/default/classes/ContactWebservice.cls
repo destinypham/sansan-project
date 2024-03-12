@@ -16,7 +16,7 @@ public with sharing class ContactWebservice {
         HttpRequest request = new HttpRequest();
         HttpResponse response = new HttpResponse();
 
-        request.setEndpoint('https://64ae072db470006a5ec68c6a.mockapi.io/contact?name=' + contactName);
+        request.setEndpoint('https://64ae072db470006a5ec68c6a.mockapi.io/contact?name=' + contactName.replaceAll(' ', '%20'));
         request.setMethod('GET');
         request.setHeader('Content-Type', 'application/json; charset=UTF-8');
         response = http.send(request);
