@@ -1,5 +1,6 @@
 public without sharing class ContactController{
     public static List<Contact> contactList;
+    
     @AuraEnabled(Cacheable = true)
     public static List<Map<String, String>> getContact(){
         HttpResponse httpResponse = ContactWebservice.getContact();

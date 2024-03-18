@@ -107,8 +107,8 @@ export default class SearchContact extends LightningElement {
         this.isModalOpen = true;
         console.log(JSON.stringify(this.listContactSelected));
         this.listContactSelected.forEach(row => {
-            if (!this.selectedContactIds.includes(row.Id)) {
-                this.selectedContactIds.push(row.Id);
+            if (!this.selectedContactIds.includes(row.id)) {
+                this.selectedContactIds.push(row.id);
             }
         });
     }
@@ -244,8 +244,8 @@ export default class SearchContact extends LightningElement {
         this.isModalOpen = true;
         console.log(JSON.stringify(this.listContactSelected));
         this.listContactSelected.forEach(row => {
-            if (!this.selectedContactIds.includes(row.Id)) {
-                this.selectedContactIds.push(row.Id);
+            if (!this.selectedContactIds.includes(row.id)) {
+                this.selectedContactIds.push(row.id);
             }
         });
         console.log(JSON.stringify(this.selectedContactIds));
