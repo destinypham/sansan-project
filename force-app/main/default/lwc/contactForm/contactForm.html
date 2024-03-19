@@ -1,0 +1,12 @@
+<template>
+    <h1 style="text-align: center; color:red; font-size: 20px">{message}</h1>
+    <lightning-card title="New Contact">
+        <div class="slds-m-around_medium">
+            <lightning-input label="First Name" value={firstName} onchange={handleFirstNameChange}></lightning-input>
+            <lightning-input label="Last Name" value={lastName} onchange={handleLastNameChange}></lightning-input>
+            <c-account-lookup onselected={handleAccountSelection} first-name={firstName} last-name={lastName}></c-account-lookup>
+            <br>
+            <lightning-button label="Save" onclick={handleSave}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

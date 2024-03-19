@@ -1,6 +1,5 @@
 public without sharing class ContactController{
     public static List<Contact> contactList;
-    
     @AuraEnabled(Cacheable = true)
     public static List<Map<String, String>> getContact(){
         HttpResponse httpResponse = ContactWebservice.getContact();
@@ -79,7 +78,7 @@ public without sharing class ContactController{
     public static String insertLeads(List<Lead> leads){
         String message = '';
         try{
-            if (leads != null && !leads.isEmpty()) {
+            if (leads != null && !leads.isEmpty()){
                 message = LeadController.insertLead(leads);
             } else{
                 message = 'No leads provided';
@@ -161,6 +160,24 @@ public without sharing class ContactController{
                 newContactList.add(contact);
             }
         }
+    }
+
+    @AuraEnabled
+    public static Boolean newContact(String firstName, String lastName, String accountId){
+        Boolean result = true;
+        try{
+            Contact contact = new Contact(
+                firstName = firstName,
+                lastName = lastName,
+                AccountId = accountId
+            );
+            if (contact != null) {
+                insert contact;
+            }
+        } catch(Exception e) {
+            result = false;
+        }
+        return result;
     }
 
 }
