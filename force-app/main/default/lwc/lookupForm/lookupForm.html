@@ -1,0 +1,11 @@
+<template>
+    <lightning-card variant="Narrow" title="New Contact" icon-name="standard:record_lookup">
+        <h1 style="text-align: center; color: red; font-size: 20px">{message}</h1>
+        <div class="slds-p-horizontal_small">
+            <lightning-input label="First Name" value={firstName} onchange={handleFirstNameChange}></lightning-input>
+            <lightning-input label="Last Name" value={lastName} onchange={handleLastNameChange}></lightning-input>
+            <lightning-record-picker label="Accounts" object-api-name="Account" onchange={handleChange}></lightning-record-picker></br>
+            <lightning-button label="Save" onclick={handleSave}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

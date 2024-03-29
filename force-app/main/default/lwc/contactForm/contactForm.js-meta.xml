@@ -8,6 +8,9 @@
         <target>lightning__HomePage</target>
         <target>lightning__Tab</target>
         <target>lightning__RecordAction</target>
+    /*
+Nhúng lcw vào flow bằng file này
+    */
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__RecordAction">
